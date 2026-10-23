@@ -72,3 +72,61 @@ test('remote peering is offered but costs more, gives less and gets refused more
   assert.equal(ev(`peerOk('${refusers[0]}','ix','ams').remote`), undefined);
   assert.deepEqual(errors, []);
 });
+
+test('Amsterdam has a second IX, FRIES-IX, with free ports up to 400G', () => {
+  const { ev, errors } = load();
+  setup(ev);
+  assert.deepEqual(JSON.parse(ev("JSON.stringify(cityIxes('ams'))")), ['ams', 'ams:fries']);
+  ev("ACT.buildPop({city:'ams'});S.pops.ams.rgen=RG.length-1;compute()");
+  const cash = () => ev('S.cash');
+  let c0 = cash();
+  ev("ACT.buyIx({city:'ams:fries',tier:2})");
+  assert.equal(ev("S.ixp['ams:fries']"), 2);
+  assert.equal(cash(), c0, '400G port is free');
+  assert.equal(ev("S.ixp.ams"), undefined, 'HAMS-IX is separate');
+  c0 = cash();
+  ev("ACT.lagIx({city:'ams:fries',d:1})");
+  assert.equal(cash(), c0, 'LAG members are free too');
+  assert.equal(ev("ixPortMo('ams:fries',3)"), ev('PORT[3].ix'), '800G costs the usual price');
+  ev("ACT.buyIx({city:'ams',tier:1});ACT.rs({city:'ams:fries'});compute()");
+  assert.ok(ev("ixSessions('ams:fries').has('drz')"));
+  assert.equal(ev("ixSessions('ams:fries').has('ggl')"), false, 'Goggle is not a member');
+  assert.equal(ev("R.useIx['ams:fries']!==undefined&&R.useIx.ams!==undefined"), true, 'both fabrics carry traffic');
+  assert.equal(ev("R.cost.ix"), ev("PORT[1].ix"), "only the HAMS-IX port is billed");
+  ev("selectCity('ams');ACT.tab({t:'peer'})");
+  const txt = ev("document.getElementById('panelBody').textContent");
+  assert.match(txt, /FRIES-IX/); assert.match(txt, /HAMS-IX/);
+  ev("S.ev.ixdown={'ams:fries':S.day+2};compute()");
+  assert.equal(ev("R.useIx['ams:fries']"), undefined, 'a FRIES-IX outage drops only that fabric');
+  assert.notEqual(ev("R.useIx.ams"), undefined);
+  ev("S.ev.ixdown={};compute()");
+  ev("ACT.cancelIx({city:'ams:fries'});ACT.cancelIx({city:'ams:fries'})");
+  assert.equal(ev("S.ixp['ams:fries']"), undefined);
+  assert.equal(ev("S.ixp.ams"), 1, 'leaving FRIES-IX keeps the HAMS-IX port');
+  assert.equal(ev("Object.keys(S.rs).filter(k=>S.rs[k]).length"), 0);
+  assert.deepEqual(errors, []);
+});
+
+test('second exchanges are wired up in every city that has one, and Barcelona has Catnip-IX', () => {
+  const { ev, errors } = load();
+  setup(ev);
+  const bad = ev("Object.keys(XIX).flatMap(k=>XIX[k].members.filter(id=>!NET[id]||!NET[id].pops.includes(XIX[k].city)).map(id=>k+':'+id)).join()");
+  assert.equal(bad, '', 'every member has a POP in the city');
+  assert.ok(ev("Object.keys(XIX).every(k=>CITY[XIX[k].city].ix&&cityIxes(XIX[k].city).includes(k))"), 'each sits beside a main IX');
+  assert.equal(ev("ixPortMo('mad:paella',1)"), ev("Math.round(ixPortMo('mad',1)*0.6)"), 'Paella-NIX is cheaper than Siesta-IX');
+  assert.equal(ev("ixName('bcn')"), 'Catnip-IX');
+  for (const k of JSON.parse(ev('JSON.stringify(Object.keys(XIX))'))) {
+    const c = k.split(':')[0];
+    ev(`if(!S.pops.${c})ACT.buildPop({city:'${c}'});S.pops.${c}.rgen=RG.length-1;ACT.buyIx({city:'${k}',tier:1});ACT.rs({city:'${k}'})`);
+    assert.equal(ev(`S.ixp['${k}']`), 1, `port at ${k}`);
+  }
+  ev('compute()');
+  for (const k of JSON.parse(ev('JSON.stringify(Object.keys(XIX))')))
+    assert.ok(ev(`ixSessions('${k}').size`) > 0, `route server sessions at ${k}`);
+  for (const c of ['ams', 'mad', 'fra', 'lon', 'nyc', 'jnb', 'syd', 'tok', 'bcn']) {
+    ev(`selectCity('${c}');ACT.tab({t:'peer'})`);
+    const txt = ev("document.getElementById('panelBody').textContent");
+    for (const k of JSON.parse(ev(`JSON.stringify(cityIxes('${c}'))`))) assert.ok(txt.includes(ev(`ixName('${k}')`)), `${k} shown in ${c}`);
+  }
+  assert.deepEqual(errors, []);
+});
