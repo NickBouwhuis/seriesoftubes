@@ -6,12 +6,68 @@ All notable changes to this project are documented here. The project follows
 
 ## [Unreleased]
 
+- Barcelona joins the map with Catnip-IX, local transit and peering.
+- More exchanges now include FRIES-IX, Paella-NIX, KleyWrecks,
+  LO-NAPS, JINXED-IX and IX Strayla, plus BB-Kicks in Tokyo.
+  FRIES-IX 10G and 100G ports and LAG members are free.
+
+## [1.10.0] — 2026-10-24
+
+- Router ports are finite. Every transit, IX, PNI and cache port, every wave
+  and every fibre channel takes a router port; 10G ports ride a breakout,
+  four to a port. The Infra tab shows how many are left, and plugging in more
+  than you have is refused.
+- More routers: up to six per POP, and six new models to swap in from the
+  Infra tab: Mikrowtik CCR-ish, Sonic the Whitebox 32 (cheap, crashes more),
+  Arrrhipster 7280R-ish and 7800R-ish (lots of ports, deep buffers, boots in
+  minutes), Disco 8K-ish (licence keys for everything) and Knockia 7750-ish.
+  A swap that would not fit what is already plugged in is refused.
+- New cities: Milan, Rome, Palermo, Lisbon and Athens in Europe; Atlanta,
+  Denver, Phoenix, Boston, Houston and Salt Lake City in the US. New cables
+  land with them (Lisbon to Brazil, Africa and the US Southeast; Genoa to
+  Sicily and Athens; Palermo to Marseille and Alexandria; Athens to Istanbul;
+  Boston to Dublin), along with local networks to peer with.
+- Rival exchanges: 25 big metros now have a second (sometimes third) IX.
+  Challengers are cheaper and share many members with the incumbent, but not
+  all of them. Each IX is its own port, LAG and route server.
+- The long tail: 60 small, odd networks with a sliver of traffic each, spread
+  over random exchanges. "Request all willing peers" signs them up in one go,
+  and they fold into one row in the network lists.
+- Europe's peering market is competitive: IX ports there cost 20% less, and
+  price wars between rival exchanges cut your port bill further. DE-KICKS
+  responds with a webinar.
+- Voda-Phony has ended settlement-free peering. It now peers only over a paid
+  PNI, through its interconnection partner.
+- New US eyeballs Spectre-um Cable and Very-Zone (paid peering only).
+- Pausing now freezes the map too: packet dots, waves and clouds stop
+  moving until you press play again (#11).
 - Ports in both buildings: with a second site, any transit port, PNI or IX
   port can now be set to "Both". That splits it into a LAG with members in
   each building (adding a member if needed), so a dark building only takes
   out half the port instead of all of it (#8).
 - The top bar no longer wraps onto a second row and covers the side panels
   on laptop-sized screens.
+- Routers make sense now: the Chonk 800 takes 800G waves and ports (a new
+  800G wave sits between 400G and 1.6T), and only the Absolute Unit has 1.6T
+  ports and takes 6.4T waves, handed off as 4×1.6T. Existing waves keep
+  their size.
+- London–Amsterdam is everywhere: three more cheap North Sea cables, and dark
+  fiber you can lease on them (and on the Channel), since you can't dig under
+  the sea.
+- Your own IX can grow (#10): upgrade its fabric from 400G to 1.6T, 6.4T and
+  25.6T. Bigger fabrics carry more and have room for more members.
+- Wave prices follow real markets: Europe is cheap, North America average,
+  Asia and South America pricier, and anything into Africa several times the
+  price. Every route has its own going rate, and new leases get about 8%
+  cheaper each year. The link planner tells you how a route compares.
+- Cairo–Dubai over the Red Sea, plus I-ME-WE-Us to Fujairah and Mumbai.
+- The Gulf: Jeddah, Riyadh and Doha. Saudi POPs need a local telecom licence,
+  gigaprojects want enormous demo networks, and now and then the neighbours
+  fall out and every link between Qatar and Saudi Arabia or the UAE goes dark
+  for months. Qatar is on the map as a peninsula now, too.
+- Tablets in landscape: slimmer side panels, bigger touch targets, and the
+  left panel tucks away while a city is open (tap "Goals & NOC" to bring it
+  back).
 
 ## [1.9.0] — 2026-10-23
 
